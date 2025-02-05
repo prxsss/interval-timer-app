@@ -1,17 +1,32 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { ref, provide } from 'vue';
+import { computed } from 'vue';
+import { removeIntervalKey } from './types/injectionKeys';
+import { v4 as uuidv4 } from 'uuid';
 import soundFile from './assets/sounds/mixkit-mouse-click-close-1113.wav';
+import type { Interval } from './types/interval';
 
 import IntervalListing from './components/IntervalListing.vue';
 
 let timer: number | null = null;
 let isPaused = false;
 const isRunning = ref(false);
-const minutes = ref(1);
-const seconds = ref(0);
 const timeLeft = ref(0);
 const rounds = ref(1);
-const intervals = ref(1);
+const intervals = ref<Interval[]>([
+  {
+    id: uuidv4(),
+    name: 'Interval 1',
+    timeLeft: 6,
+    originalTime: 6,
+  },
+  {
+    id: uuidv4(),
+    name: 'Interval 2',
+    timeLeft: 3,
+    originalTime: 3,
+  },
+]);
 
 const formattedTime = computed(() => {
   const min = Math.floor(timeLeft.value / 60)
@@ -21,26 +36,45 @@ const formattedTime = computed(() => {
   return `${min}:${sec}`;
 });
 
-const startCountdown = () => {
+const startCountdown = async () => {
   if (timer && timeLeft.value > 0) {
     isPaused = false;
     isRunning.value = true;
     return;
   }
-  timeLeft.value = minutes.value * 60 + seconds.value;
-  if (timeLeft.value <= 0) return;
 
   isRunning.value = true;
 
-  timer = setInterval(() => {
-    if (timeLeft.value > 0) {
-      if (!isPaused) {
-        timeLeft.value--;
+  for (let i = 0; i < rounds.value; i++) {
+    for (let j = 0; j < intervals.value.length; j++) {
+      if (intervals.value[j].timeLeft <= 0) {
+        continue;
       }
-    } else {
+      await runCountdown(intervals.value[j]);
+    }
+    if (i < rounds.value - 1) {
       resetCountdown();
     }
-  }, 1000);
+  }
+
+  isRunning.value = false;
+};
+
+const runCountdown = (interval: Interval) => {
+  return new Promise<void>((resolve) => {
+    timeLeft.value = interval.timeLeft;
+    timer = setInterval(() => {
+      if (interval.timeLeft > 0) {
+        if (!isPaused) {
+          interval.timeLeft--;
+          timeLeft.value--;
+        }
+      } else {
+        clearInterval(timer as number);
+        resolve();
+      }
+    }, 1000);
+  });
 };
 
 const pauseCountdown = () => {
@@ -54,6 +88,9 @@ const resetCountdown = () => {
   timeLeft.value = 0;
   isPaused = false;
   isRunning.value = false;
+  intervals.value.forEach((interval) => {
+    interval.timeLeft = interval.originalTime;
+  });
 };
 
 const handleStartAndPause = () => {
@@ -78,6 +115,21 @@ const toggleSound = () => {
   const soundEffect = new Audio(soundFile);
   soundEffect.play();
 };
+
+const addInterval = () => {
+  intervals.value.push({
+    id: uuidv4(),
+    name: `Interval ${intervals.value.length + 1}`,
+    timeLeft: 150,
+    originalTime: 150,
+  });
+};
+
+const removeInterval = (id: string) => {
+  intervals.value = intervals.value.filter((interval) => interval.id !== id);
+};
+
+provide(removeIntervalKey, removeInterval);
 </script>
 
 <template>
@@ -121,13 +173,13 @@ const toggleSound = () => {
       </div>
       <div class="max-h-72 space-y-4 overflow-y-auto">
         <IntervalListing
-          v-for="(_, index) in new Array(intervals)"
-          :id="index"
-          :key="index"
+          v-for="interval in intervals"
+          :interval="interval"
+          :key="interval.id"
         />
       </div>
       <div>
-        <button @click="intervals++" class="btn btn-neutral btn-sm w-full">
+        <button @click="addInterval" class="btn btn-neutral btn-sm w-full">
           Add Interval
         </button>
       </div>

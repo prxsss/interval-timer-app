@@ -1,33 +1,60 @@
 <script setup lang="ts">
-import TimerModal from './TimerModal.vue'
+import { ref, computed, onMounted } from 'vue';
+import type { Interval } from '../types/interval';
+
+import TimerModal from './TimerModal.vue';
+
+const maxTime = ref(0);
 
 const props = defineProps<{
-    id: number
-}>()
+  interval: Interval;
+}>();
+
+const formattedTime = computed(() => {
+  const min = Math.floor(props.interval.timeLeft / 60)
+    .toString()
+    .padStart(2, '0');
+  const sec = (props.interval.timeLeft % 60).toString().padStart(2, '0');
+  return `${min}:${sec}`;
+});
 
 const openModal = () => {
-    const modal = document.getElementById(
-        `my_modal_${props.id}`
-    ) as HTMLDialogElement
-    if (modal) {
-        modal.showModal()
-    }
-}
+  const modal = document.getElementById(
+    `my_modal_${props.interval.id}`
+  ) as HTMLDialogElement;
+  if (modal) {
+    modal.showModal();
+  }
+};
+
+onMounted(() => {
+  maxTime.value = props.interval.timeLeft;
+});
 </script>
 
 <template>
-    <div class="flex items-center space-x-4 rounded-xl bg-base-200">
-        <div class="cursor-move -space-x-2 py-4 pl-4 text-sm">
-            <i class="pi pi-ellipsis-v"></i>
-            <i class="pi pi-ellipsis-v"></i>
-        </div>
-        <div
-            @click="openModal"
-            class="flex flex-1 cursor-pointer items-center justify-between py-4 pr-4 font-medium"
-        >
-            <div>IntervalListing</div>
-            <div>0:00</div>
-        </div>
+  <div class="rounded-xl bg-base-200">
+    <div class="flex items-center space-x-4">
+      <div class="cursor-move -space-x-2 pl-4 pt-4 text-sm">
+        <i class="pi pi-ellipsis-v"></i>
+        <i class="pi pi-ellipsis-v"></i>
+      </div>
+      <div
+        @click="openModal"
+        class="flex flex-1 cursor-pointer items-center justify-between pr-4 pt-4 font-medium"
+      >
+        <div>{{ props.interval.name }}</div>
+        <div>{{ formattedTime }}</div>
+      </div>
     </div>
-    <TimerModal :modal-id="`my_modal_${props.id}`" />
+    <div class="px-4 pb-4">
+      <progress
+        class="progress"
+        :value="maxTime - props.interval.timeLeft"
+        :max="maxTime"
+      ></progress>
+    </div>
+  </div>
+
+  <TimerModal :interval-id="props.interval.id" />
 </template>
