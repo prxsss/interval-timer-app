@@ -1,7 +1,11 @@
 <script setup lang="ts">
 import { ref, provide } from 'vue';
 import { computed } from 'vue';
-import { removeIntervalKey } from './types/injectionKeys';
+import {
+  removeIntervalKey,
+  intervalsKey,
+  updateIntervalKey,
+} from './types/injectionKeys';
 import { v4 as uuidv4 } from 'uuid';
 import soundFile from './assets/sounds/mixkit-mouse-click-close-1113.wav';
 import type { Interval } from './types/interval';
@@ -17,14 +21,14 @@ const intervals = ref<Interval[]>([
   {
     id: uuidv4(),
     name: 'Interval 1',
-    timeLeft: 6,
-    originalTime: 6,
+    timeLeft: 100,
+    originalTime: 100,
   },
   {
     id: uuidv4(),
     name: 'Interval 2',
-    timeLeft: 3,
-    originalTime: 3,
+    timeLeft: 30,
+    originalTime: 30,
   },
 ]);
 
@@ -120,15 +124,32 @@ const addInterval = () => {
   intervals.value.push({
     id: uuidv4(),
     name: `Interval ${intervals.value.length + 1}`,
-    timeLeft: 150,
-    originalTime: 150,
+    timeLeft: 30,
+    originalTime: 30,
   });
+};
+
+const updateInterval = (newInterval: Interval) => {
+  const index = intervals.value.findIndex(
+    (interval) => interval.id == newInterval.id
+  );
+  if (index >= 0) {
+    if (isRunning.value) {
+      resetCountdown();
+    }
+
+    intervals.value[index].name = newInterval.name;
+    intervals.value[index].timeLeft = newInterval.timeLeft;
+    intervals.value[index].originalTime = newInterval.originalTime;
+  }
 };
 
 const removeInterval = (id: string) => {
   intervals.value = intervals.value.filter((interval) => interval.id !== id);
 };
 
+provide(intervalsKey, intervals);
+provide(updateIntervalKey, updateInterval);
 provide(removeIntervalKey, removeInterval);
 </script>
 

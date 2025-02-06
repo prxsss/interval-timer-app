@@ -1,20 +1,18 @@
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue';
+import { computed } from 'vue';
 import type { Interval } from '../types/interval';
 
 import TimerModal from './TimerModal.vue';
-
-const maxTime = ref(0);
 
 const props = defineProps<{
   interval: Interval;
 }>();
 
 const formattedTime = computed(() => {
-  const min = Math.floor(props.interval.timeLeft / 60)
+  const min = Math.floor(props.interval.originalTime / 60)
     .toString()
     .padStart(2, '0');
-  const sec = (props.interval.timeLeft % 60).toString().padStart(2, '0');
+  const sec = (props.interval.originalTime % 60).toString().padStart(2, '0');
   return `${min}:${sec}`;
 });
 
@@ -26,10 +24,6 @@ const openModal = () => {
     modal.showModal();
   }
 };
-
-onMounted(() => {
-  maxTime.value = props.interval.timeLeft;
-});
 </script>
 
 <template>
@@ -49,12 +43,12 @@ onMounted(() => {
     </div>
     <div class="px-4 pb-4">
       <progress
-        class="progress"
-        :value="maxTime - props.interval.timeLeft"
-        :max="maxTime"
+        class="progress [&::-moz-progress-bar]:transition-all [&::-webkit-progress-value]:transition-all"
+        :value="props.interval.originalTime - props.interval.timeLeft"
+        :max="props.interval.originalTime"
       ></progress>
     </div>
   </div>
 
-  <TimerModal :interval-id="props.interval.id" />
+  <TimerModal :interval="props.interval" />
 </template>
