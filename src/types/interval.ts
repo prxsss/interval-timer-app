@@ -1,5 +1,5 @@
 export interface Interval {
-  id: string;
+  readonly id: string;
   name: string;
   timeLeft: number;
   originalTime: number;
