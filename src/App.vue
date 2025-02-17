@@ -10,6 +10,7 @@ import { v4 as uuidv4 } from 'uuid';
 import soundFile from './assets/sounds/mixkit-mouse-click-close-1113.wav';
 import type { Interval } from './types/interval';
 import { themeChange } from 'theme-change';
+import { VueDraggable } from 'vue-draggable-plus';
 
 import IntervalListing from './components/IntervalListing.vue';
 
@@ -229,13 +230,18 @@ onMounted(() => {
           </label>
         </div>
       </div>
-      <div class="max-h-72 space-y-4 overflow-y-auto p-1">
+      <VueDraggable
+        v-model="intervals"
+        :animation="150"
+        handle=".handle"
+        class="max-h-72 space-y-4 overflow-y-auto p-4"
+      >
         <IntervalListing
           v-for="interval in intervals"
-          :interval="interval"
           :key="interval.id"
+          :interval="interval"
         />
-      </div>
+      </VueDraggable>
       <div>
         <button @click="addInterval" class="btn btn-primary btn-sm w-full">
           Add Interval
