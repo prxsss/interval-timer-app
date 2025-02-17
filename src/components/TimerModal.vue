@@ -135,7 +135,7 @@ onMounted(() => {
         />
       </label>
       <div class="flex space-x-3">
-        <button @click="handleSave" class="btn btn-neutral flex-1">Save</button>
+        <button @click="handleSave" class="btn btn-primary flex-1">Save</button>
         <button @click="closeModal" class="btn flex-1">Cancel</button>
       </div>
     </div>

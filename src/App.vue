@@ -163,7 +163,7 @@ onMounted(() => {
     <div
       class="relative w-full max-w-3xl space-y-6 rounded-xl bg-base-100 p-6 shadow"
     >
-      <label class="swap swap-rotate absolute right-4 top-4 text-base-content">
+      <label class="swap swap-rotate absolute right-5 top-5 text-base-content">
         <!-- this hidden checkbox controls the state -->
         <input
           type="checkbox"
@@ -200,25 +200,25 @@ onMounted(() => {
         <button
           @click="handleStartAndPause"
           :class="[
-            'btn swap btn-neutral text-lg',
+            'btn btn-primary swap text-lg',
             { 'swap-active': isRunning },
           ]"
         >
           <i class="pi pi-pause swap-on"></i>
           <i class="pi pi-play swap-off"></i>
         </button>
-        <button @click="resetCountdown" class="btn btn-neutral text-lg">
+        <button @click="resetCountdown" class="btn btn-primary text-lg">
           <i class="pi pi-refresh"></i>
         </button>
       </div>
       <div class="flex items-center justify-between">
         <div class="space-x-4">
           <span class="text-lg font-semibold">Rounds: </span>
-          <button @click="decrementRounds" class="btn">
+          <button @click="decrementRounds" class="btn btn-ghost">
             <i class="pi pi-minus"></i>
           </button>
           <span>{{ rounds }}</span>
-          <button @click="incrementRounds" class="btn">
+          <button @click="incrementRounds" class="btn btn-ghost">
             <i class="pi pi-plus"></i>
           </button>
         </div>
@@ -229,7 +229,7 @@ onMounted(() => {
           </label>
         </div>
       </div>
-      <div class="max-h-72 space-y-4 overflow-y-auto">
+      <div class="max-h-72 space-y-4 overflow-y-auto p-1">
         <IntervalListing
           v-for="interval in intervals"
           :interval="interval"
@@ -237,7 +237,7 @@ onMounted(() => {
         />
       </div>
       <div>
-        <button @click="addInterval" class="btn btn-neutral btn-sm w-full">
+        <button @click="addInterval" class="btn btn-primary btn-sm w-full">
           Add Interval
         </button>
       </div>

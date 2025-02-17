@@ -27,7 +27,7 @@ const openModal = () => {
 </script>
 
 <template>
-  <div class="rounded-xl bg-base-200">
+  <div class="rounded-xl bg-base-100 shadow dark:bg-base-200">
     <div class="flex items-center space-x-4">
       <div class="cursor-move -space-x-2 pl-4 pt-4 text-sm">
         <i class="pi pi-ellipsis-v"></i>
@@ -43,7 +43,7 @@ const openModal = () => {
     </div>
     <div class="px-4 pb-4">
       <progress
-        class="progress [&::-moz-progress-bar]:transition-all [&::-webkit-progress-value]:transition-all"
+        class="progress progress-primary [&::-moz-progress-bar]:transition-all [&::-webkit-progress-value]:transition-all"
         :value="props.interval.originalTime - props.interval.timeLeft"
         :max="props.interval.originalTime"
       ></progress>
