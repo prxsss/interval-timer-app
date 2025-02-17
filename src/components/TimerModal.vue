@@ -1,10 +1,12 @@
 <script setup lang="ts">
-import { ref, inject, reactive, onMounted, computed } from 'vue';
+import { ref, inject, reactive, onMounted, onUnmounted, computed } from 'vue';
 import { removeIntervalKey, updateIntervalKey } from '../types/injectionKeys';
 import type { Interval } from '../types/interval';
 
 const props = defineProps<{
   interval: Interval;
+  isShow: boolean;
+  closeModal: () => void;
 }>();
 
 const minutes = ref(0);
@@ -71,16 +73,15 @@ const handleSave = () => {
   ).close();
 };
 
-const closeModal = () => {
-  const modal = document.getElementById(
-    `my_modal_${props.interval.id}`
-  ) as HTMLDialogElement;
-  if (modal) {
-    modal.close();
+const handleKeyDown = (event: KeyboardEvent) => {
+  if (event.key === 'Escape' && props.isShow === true) {
+    props.closeModal();
   }
 };
 
 onMounted(() => {
+  window.addEventListener('keydown', handleKeyDown);
+
   formData.id = props.interval.id;
   formData.name = props.interval.name;
   formData.timeLeft = props.interval.timeLeft;
@@ -88,6 +89,10 @@ onMounted(() => {
 
   minutes.value = Math.floor(formData.timeLeft / 60);
   seconds.value = formData.timeLeft % 60;
+});
+
+onUnmounted(() => {
+  window.removeEventListener('keydown', handleKeyDown);
 });
 </script>
 
@@ -136,12 +141,12 @@ onMounted(() => {
       </label>
       <div class="flex space-x-3">
         <button @click="handleSave" class="btn btn-primary flex-1">Save</button>
-        <button @click="closeModal" class="btn flex-1">Cancel</button>
+        <button @click="props.closeModal" class="btn flex-1">Cancel</button>
       </div>
     </div>
 
     <form method="dialog" class="modal-backdrop">
-      <button>close</button>
+      <button @click="props.closeModal">close</button>
     </form>
   </dialog>
 </template>
